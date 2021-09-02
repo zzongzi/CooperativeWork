@@ -13,11 +13,11 @@
 MVVVM
 
 ### 第三方库
-Retrofit2
-Glide
-GSYVideoPlayer————视频播放库 
-Htextview————文字加载动画
-SmartRefreshLayout————上拉加载 下拉刷新
+* Retrofit2
+* Glide
+* GSYVideoPlayer————视频播放库 
+* Htextview————文字加载动画
+* SmartRefreshLayout————上拉加载 下拉刷新
 ### 总结
 这是几个月前完成的一次合作开发项目，这次修改相比以前没有多大修改，主要是将社区-推荐界面的 banner 换成了我自己写的一个简单的 banner 。
 有关分包方面，因为最开始的分包是其中一个合作开发人员分的，其实不太规范，我这里还没有对分包进行修改。
