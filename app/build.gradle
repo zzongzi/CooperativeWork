@@ -99,4 +99,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //自己写的一个简单的banner
+    implementation 'com.github.zzongzi:SimpleBanner:2.0'
 }

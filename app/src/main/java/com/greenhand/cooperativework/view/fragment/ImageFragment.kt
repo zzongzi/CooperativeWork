@@ -17,7 +17,7 @@ class ImageFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         //获取Binding 并绑定传入的数据
         dataBinding = FragmentImageBinding.inflate(layoutInflater)
         dataBinding.url = arguments?.getString("url")

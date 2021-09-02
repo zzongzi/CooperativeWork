@@ -2,40 +2,39 @@ package com.greenhand.cooperativework.view.fragment.community
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.greenhand.cooperativework.R
 import com.greenhand.cooperativework.base.BaseSimplifyRecyclerAdapter
 import com.greenhand.cooperativework.bean.CommunityFirstRecommendBean
 import com.greenhand.cooperativework.bean.CommunityRecommendBean
 import com.greenhand.cooperativework.bean.CommunityRecommendImageBean
 import com.greenhand.cooperativework.bean.VideoDetailsBean
-import com.greenhand.cooperativework.databinding.*
+import com.greenhand.cooperativework.databinding.ItemCommunityImageBinding
+import com.greenhand.cooperativework.databinding.ItemCommunityVideoBindingImpl
 import com.greenhand.cooperativework.utils.TimeUtil
 import com.greenhand.cooperativework.utils.toast
 import com.greenhand.cooperativework.view.activity.ImageDetailsActivity
 import com.greenhand.cooperativework.view.activity.VideoDetailsActivity
 import com.greenhand.cooperativework.view.fragment.RefreshAndLoad
 import com.greenhand.cooperativework.viewmodel.fragment.CommunityRecommendViewModel
-import com.ndhzs.slideshow.SlideShow
-import com.ndhzs.slideshow.viewpager2.transformer.ScaleInTransformer
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
+import com.zz.simplebanner.SimpleBanner
 import java.util.*
 
 class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
     private lateinit var mCommunityImageListView: RecyclerView
     private lateinit var mSmartRefreshLayout: SmartRefreshLayout
     private lateinit var mGridLayoutManager: GridLayoutManager
-    private var mSlideShowList = ArrayList<CommunityFirstRecommendBean.ItemX>()
+    private var mBannerList = ArrayList<CommunityFirstRecommendBean.ItemX>()
     private var mImageList = ArrayList<CommunityRecommendBean.Content>()
     private var mVideoList = ArrayList<CommunityRecommendBean.Content>()
     private val mViewModel by lazy {
@@ -90,7 +89,9 @@ class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
         //设置下拉刷新
         mSmartRefreshLayout.setOnRefreshListener {
             //刷新时修改item数量为初始值0
-            (mCommunityImageListView.adapter as BaseSimplifyRecyclerAdapter).deleteItemCountAndNotifyRefresh((mCommunityImageListView.adapter as BaseSimplifyRecyclerAdapter).itemCount)
+            (mCommunityImageListView.adapter as BaseSimplifyRecyclerAdapter).deleteItemCountAndNotifyRefresh(
+                (mCommunityImageListView.adapter as BaseSimplifyRecyclerAdapter).itemCount
+            )
             startLoadData()
         }
     }
@@ -101,7 +102,7 @@ class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
 
     private fun observeData() {
         mViewModel.recommendList.observe(viewLifecycleOwner) {
-            mSlideShowList = it[0] as ArrayList<CommunityFirstRecommendBean.ItemX>
+            mBannerList = it[0] as ArrayList<CommunityFirstRecommendBean.ItemX>
             mImageList = it[1] as ArrayList<CommunityRecommendBean.Content>
             mVideoList = it[2] as ArrayList<CommunityRecommendBean.Content>
 
@@ -110,12 +111,12 @@ class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
                 //创建时count为1 每次请求回来+14个数据
                 (adapter as BaseSimplifyRecyclerAdapter)
                     .addItemCountAndNotifyRefresh(14)
-            }else {
+            } else {
                 mCommunityImageListView
                     .adapter = BaseSimplifyRecyclerAdapter(15)
                     .onBindView(
                         R.layout.item_community_banner,
-                        SlideShowHolder::class.java,
+                        BannerHolder::class.java,
                         { position -> position == 0 },
                         { holder, position ->
                             initSlideShow(holder)
@@ -158,28 +159,20 @@ class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
     }
 
     private var mIsFirstLoadSlidShow = true
-    private fun initSlideShow(slideShowHolder: SlideShowHolder) {
-        val slideShow = slideShowHolder.slideShow
+    private fun initSlideShow(bannerHolder: BannerHolder) {
         val imagePath = ArrayList<String>()
-        if (mSlideShowList.size > 0) {
-            imagePath.add(mSlideShowList[0].data.image)
-            imagePath.add(mSlideShowList[1].data.image)
-            imagePath.add(mSlideShowList[2].data.image)
+        if (mBannerList.size > 0) {
+            imagePath.add(mBannerList[0].data.image)
+            imagePath.add(mBannerList[1].data.image)
+            imagePath.add(mBannerList[2].data.image)
         }
-        if (mIsFirstLoadSlidShow) {
-            mIsFirstLoadSlidShow = false
-            slideShow
-                .addTransformer(ScaleInTransformer())
-                .setAutoSlideEnabled(true)
-                .setDelayTime(5000)
-                .setTimeInterpolator(AccelerateDecelerateInterpolator())
-                .setAdapter(imagePath) { data, imageView, holder, position ->
-                    Glide
-                        .with(this)
-                        .load(data)
-                        .into(imageView)
-                }
-        }
+        bannerHolder
+            .simpleBanner.load(imagePath)
+            .onClick {
+                Toast.makeText(context, "缺少API", Toast.LENGTH_SHORT).show()
+            }
+            .setScaleType(ImageView.ScaleType.CENTER_CROP)
+
     }
 
     override fun finishRefresh() {
@@ -217,8 +210,8 @@ class CommunityRecommendFragment : Fragment(), RefreshAndLoad {
         }
     }
 
-    class SlideShowHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val slideShow: SlideShow = itemView.findViewById(R.id.recommend_imageShow)
+    class BannerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val simpleBanner: SimpleBanner = itemView.findViewById(R.id.banner_community)
     }
 
     private fun initVideoBean(content: CommunityRecommendBean.Content): VideoDetailsBean {
