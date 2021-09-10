@@ -10,7 +10,7 @@
 详见 https://www.wanandroid.com/blog/show/2718
 
 ### 架构
-MVVVM
+MVVM
 
 ### 第三方库
 * Retrofit2
